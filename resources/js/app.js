@@ -1,19 +1,27 @@
-import './bootstrap';
-import { createApp } from 'vue';
-import '../css/app.css';
+import './bootstrap'
+import { createApp } from 'vue'
+import '../css/app.css'
 
 // Import des composants
-import ExampleComponent from './components/ExampleComponent.vue';
-import Navbar from './components/Navbar.vue';
-import LoginForm from './components/LoginForm.vue';
-import RegisterForm from './components/RegisterForm.vue';
+import ExampleComponent from './components/ExampleComponent.vue'
+import Navbar from './components/Navbar.vue'
+import LoginForm from './components/LoginForm.vue'
+import RegisterForm from './components/RegisterForm.vue'
+import ArticleList from './components/ArticleList.vue'
+import ArticleForm from './components/ArticleForm.vue'
+import ArticleView from './components/ArticleView.vue'
 
-const app = createApp({});
+// Création de l'application Vue
+const app = createApp({})
 
 // Enregistrement des composants
-app.component('example-component', ExampleComponent);
-app.component('navbar', Navbar);
-app.component('login-form', LoginForm);
-app.component('register-form', RegisterForm);
+app.component('example-component', ExampleComponent)
+app.component('navbar', Navbar)
+app.component('login-form', LoginForm)
+app.component('register-form', RegisterForm)
+app.component('article-list', ArticleList)
+app.component('article-form', ArticleForm)
+app.component('article-view', ArticleView)
 
-app.mount('#app');
+// Montage de l'application
+app.mount('#app')
