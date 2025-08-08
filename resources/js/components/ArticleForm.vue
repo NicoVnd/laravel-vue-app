@@ -35,19 +35,6 @@
         </p>
       </div>
 
-      <!-- Options de publication -->
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id="publish" 
-          v-model="form.publish" 
-          class="w-4 h-4 text-[#1E40AF] border-gray-300 rounded focus:ring-[#D4B896]"
-        >
-        <label for="publish" class="text-sm font-medium text-gray-700">
-          Publier immédiatement
-        </label>
-      </div>
-
       <!-- Messages d'erreur -->
       <div v-if="error" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
         {{ error }}
@@ -96,8 +83,8 @@ export default {
     return {
       form: {
         title: '',
-        content: '',
-        publish: false
+        content: ''
+        // publish supprimé
       },
       loading: false,
       error: null
@@ -112,7 +99,7 @@ export default {
     if (this.article) {
       this.form.title = this.article.title
       this.form.content = this.article.content
-      this.form.publish = !!this.article.published_at
+      // Ligne publish supprimée
     }
   },
   methods: {

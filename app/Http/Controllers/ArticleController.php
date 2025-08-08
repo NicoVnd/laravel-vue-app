@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Article;
 
 class ArticleController extends Controller
 {
@@ -34,25 +35,27 @@ class ArticleController extends Controller
         return view('articles.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse
     {
         $this->authorize('create', Article::class);
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'publish' => 'boolean'
+            'content' => 'required|string'
         ]);
 
         $article = Article::create([
             'title' => $validated['title'],
             'content' => $validated['content'],
             'user_id' => Auth::id(),
-            'published_at' => $request->boolean('publish') ? now() : null
+            'published_at' => now()
         ]);
 
-        return redirect()->route('articles.show', $article)
-            ->with('success', 'Article créé avec succès!');
+        return response()->json([
+            'success' => true,
+            'redirect' => route('home'),
+            'message' => 'Article créé avec succès!'
+        ]);
     }
 
     public function edit(Article $article): View
@@ -74,11 +77,11 @@ class ArticleController extends Controller
         $article->update([
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'published_at' => $request->boolean('publish') ? ($article->published_at ?? now()) : null
+            'published_at' => now()  // Toujours publier
         ]);
 
-        return redirect()->route('articles.show', $article)
-            ->with('success', 'Article mis à jour avec succès!');
+        return redirect()->route('articles.index')
+            ->with('success', 'Article modifié avec succès!');
     }
 
     private function injectVariables(string $content): string
