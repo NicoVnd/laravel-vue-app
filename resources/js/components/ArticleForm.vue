@@ -22,16 +22,12 @@
       <!-- Contenu -->
       <div>
         <label for="content" class="block text-sm font-semibold text-gray-700 mb-2">Contenu</label>
-        <textarea 
-          id="content" 
-          v-model="form.content" 
-          rows="12"
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4B896] focus:border-[#D4B896] transition-all duration-300"
-          placeholder="Rédigez votre article ici... Vous pouvez utiliser des variables comme {{nom_utilisateur}} et {{date_lecture}}"
-          required
-        ></textarea>
+        <wysiwyg-editor 
+          v-model="form.content"
+          class="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#D4B896] focus-within:border-[#D4B896] transition-all duration-300"
+        />
         <p class="mt-2 text-sm text-gray-500">
-          💡 Astuce : Utilisez <code class="bg-gray-100 px-1 rounded">{{nom_utilisateur}}</code> et <code class="bg-gray-100 px-1 rounded">{{date_lecture}}</code> pour insérer des variables dynamiques
+          💡 Astuce : Utilisez le bouton "Variables" pour insérer <code class="bg-gray-100 px-1 rounded">{{nom_utilisateur}}</code> et <code class="bg-gray-100 px-1 rounded">{{date_lecture}}</code>
         </p>
       </div>
 
@@ -70,9 +66,13 @@
 
 <script>
 import axios from 'axios'
+import WysiwygEditor from './WysiwygEditor.vue'
 
 export default {
   name: 'ArticleForm',
+  components: {
+    WysiwygEditor
+  },
   props: {
     article: {
       type: Object,
@@ -84,10 +84,12 @@ export default {
       form: {
         title: '',
         content: ''
-        // publish supprimé
       },
       loading: false,
-      error: null
+      error: null,
+      // Ajouter les variables pour éviter les erreurs Vue
+      nom_utilisateur: '{{nom_utilisateur}}',
+      date_lecture: '{{date_lecture}}'
     }
   },
   computed: {
