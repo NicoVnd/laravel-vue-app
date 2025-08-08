@@ -27,6 +27,7 @@ Route::post('/articles', [ArticleController::class, 'store'])->name('articles.st
 Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit')->middleware('auth');
 Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update')->middleware('auth');
+Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy')->middleware('auth');
 
 // API pour récupérer l'utilisateur connecté
 Route::get('/api/user', [AuthController::class, 'user'])->middleware('auth');

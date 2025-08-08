@@ -21,6 +21,14 @@
             </svg>
             Modifier
           </a>
+          
+          <button @click="deleteArticle"
+                  class="bg-red-500/20 hover:bg-red-500/30 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Supprimer
+          </button>
         </div>
       </div>
       
@@ -106,6 +114,22 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       })
+    }, 
+    async deleteArticle() {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+        return
+      }
+      
+      try {
+        const response = await axios.delete(`/articles/${this.article.id}`)
+        if (response.data.success) {
+          alert('Article supprimé avec succès!')
+          window.location.href = '/'
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error)
+        alert('Erreur lors de la suppression de l\'article')
+      }
     }
   }
 }

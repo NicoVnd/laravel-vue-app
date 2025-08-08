@@ -84,6 +84,18 @@ class ArticleController extends Controller
             ->with('success', 'Article modifié avec succès!');
     }
 
+    public function destroy(Article $article): JsonResponse
+    {
+        $this->authorize('delete', $article);
+        
+        $article->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Article supprimé avec succès!'
+        ]);
+    }
+
     private function injectVariables(string $content): string
     {
         $variables = [

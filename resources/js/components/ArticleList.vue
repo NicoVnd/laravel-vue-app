@@ -50,13 +50,24 @@
           <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{{ article.title }}</h2>
           <p class="text-gray-600 mb-4 line-clamp-3">{{ getExcerpt(article.content) }}</p>
           
-          <a :href="`/articles/${article.id}`" 
-             class="inline-flex items-center text-[#D4B896] hover:text-[#C4A886] font-semibold transition-colors duration-300">
-            Lire la suite
-            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </a>
+          <div class="flex items-center justify-between">
+            <a :href="`/articles/${article.id}`" 
+               class="inline-flex items-center text-[#D4B896] hover:text-[#C4A886] font-semibold transition-colors duration-300">
+              Lire la suite
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+            
+            <button v-if="canDeleteArticle(article)" 
+                    @click="deleteArticle(article.id)"
+                    class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-300"
+                    title="Supprimer l'article">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </article>
     </div>
@@ -113,6 +124,30 @@ export default {
     getExcerpt(content) {
       const text = content.replace(/<[^>]*>/g, '')
       return text.length > 150 ? text.substring(0, 150) + '...' : text
+    },
+    canDeleteArticle(article) {
+      return this.user && 
+             this.user.roles && 
+             this.user.roles.some(role => role.name === 'redacteur') &&
+             this.user.id === article.user_id
+    },
+    async deleteArticle(articleId) {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+        return
+      }
+      
+      try {
+        const response = await axios.delete(`/articles/${articleId}`)
+        if (response.data.success) {
+          // Recharger la liste des articles
+          await this.loadArticles()
+          // Optionnel : afficher un message de succès
+          alert('Article supprimé avec succès!')
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error)
+        alert('Erreur lors de la suppression de l\'article')
+      }
     }
   }
 }
