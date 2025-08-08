@@ -10,7 +10,7 @@
 <body class="bg-gray-100">
     <div id="app">
         <navbar></navbar>
-        <main class="container mx-auto px-4 py-8">
+        <main class="container mx-auto px-4 py-8 pt-28">
             @yield('content')
         </main>
     </div>
