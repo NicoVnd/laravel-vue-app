@@ -1,19 +1,25 @@
 <template>
-  <div class="bg-white rounded-xl shadow-xl p-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-[#1E40AF] mb-2">{{ isEdit ? 'Modifier l\'article' : 'Créer un nouvel article' }}</h1>
-      <p class="text-gray-600">{{ isEdit ? 'Modifiez votre article' : 'Rédigez votre article avec l\'éditeur' }}</p>
+  <div class="bg-white rounded-lg shadow-lg p-8">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">
+        {{ isEditing ? 'Modifier l\'article' : 'Créer un nouvel article' }}
+      </h1>
+      <p class="text-gray-600 mt-2">
+        {{ isEditing ? 'Modifiez votre article ci-dessous' : 'Rédigez votre article en utilisant l\'éditeur ci-dessous' }}
+      </p>
     </div>
 
     <form @submit.prevent="submitForm" class="space-y-6">
       <!-- Titre -->
       <div>
-        <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Titre de l'article</label>
-        <input 
-          type="text" 
-          id="title" 
-          v-model="form.title" 
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4B896] focus:border-[#D4B896] transition-all duration-300"
+        <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">
+          Titre de l'article
+        </label>
+        <input
+          type="text"
+          id="title"
+          v-model="form.title"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent transition-colors"
           placeholder="Entrez le titre de votre article"
           required
         >
@@ -21,52 +27,46 @@
 
       <!-- Contenu -->
       <div>
-        <label for="content" class="block text-sm font-semibold text-gray-700 mb-2">Contenu</label>
+        <label for="content" class="block text-sm font-semibold text-gray-700 mb-2">
+          Contenu de l'article
+        </label>
         <wysiwyg-editor 
-          v-model="form.content"
-          class="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#D4B896] focus-within:border-[#D4B896] transition-all duration-300"
-        />
-        <p class="mt-2 text-sm text-gray-500">
-          💡 Astuce : Utilisez le bouton "Variables" pour insérer <code class="bg-gray-100 px-1 rounded">{{nom_utilisateur}}</code> et <code class="bg-gray-100 px-1 rounded">{{date_lecture}}</code>
-        </p>
-      </div>
-
-      <!-- Messages d'erreur -->
-      <div v-if="error" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-        {{ error }}
+          v-model="form.content" 
+          placeholder="Rédigez votre article ici..."
+        ></wysiwyg-editor>
       </div>
 
       <!-- Boutons -->
-      <div class="flex space-x-4">
-        <button 
-          type="submit" 
-          :disabled="loading"
-          class="flex-1 bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white py-3 px-6 rounded-lg font-semibold hover:from-[#1D4ED8] hover:to-[#2563EB] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span v-if="loading" class="flex items-center justify-center">
-            <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            {{ isEdit ? 'Modification...' : 'Création...' }}
-          </span>
-          <span v-else>
-            {{ isEdit ? 'Modifier l\'article' : 'Créer l\'article' }}
-          </span>
-        </button>
-        
-        <a href="/" 
-           class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-300">
-          Annuler
+      <div class="flex justify-between items-center pt-6">
+        <a href="/" class="text-gray-600 hover:text-gray-800 font-medium transition-colors">
+          ← Retour à l'accueil
         </a>
+        
+        <div class="flex space-x-4">
+          <button
+            type="button"
+            @click="saveDraft"
+            class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+          >
+            Sauvegarder en brouillon
+          </button>
+          
+          <button
+            type="submit"
+            :disabled="isSubmitting"
+            class="px-6 py-3 bg-[#1E40AF] text-white rounded-lg hover:bg-[#1D4ED8] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ isSubmitting ? 'Publication...' : (isEditing ? 'Mettre à jour' : 'Publier l\'article') }}
+          </button>
+        </div>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import WysiwygEditor from './WysiwygEditor.vue'
+import axios from 'axios'
 
 export default {
   name: 'ArticleForm',
@@ -77,6 +77,10 @@ export default {
     article: {
       type: Object,
       default: null
+    },
+    isEditing: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -85,53 +89,62 @@ export default {
         title: '',
         content: ''
       },
-      loading: false,
-      error: null,
-      // Ajouter les variables pour éviter les erreurs Vue
-      nom_utilisateur: '{{nom_utilisateur}}',
-      date_lecture: '{{date_lecture}}'
-    }
-  },
-  computed: {
-    isEdit() {
-      return !!this.article
+      isSubmitting: false
     }
   },
   mounted() {
-    if (this.article) {
+    if (this.isEditing && this.article) {
       this.form.title = this.article.title
       this.form.content = this.article.content
-      // Ligne publish supprimée
     }
   },
   methods: {
     async submitForm() {
-      this.loading = true
-      this.error = null
+      this.isSubmitting = true
       
       try {
         let response
-        if (this.isEdit) {
-          response = await axios.put(`/articles/${this.article.id}`, this.form)
-        } else {
-          response = await axios.post('/articles', this.form)
-        }
         
-        if (response.data.success) {
-          window.location.href = response.data.redirect
+        if (this.isEditing && this.article && this.article.id) {
+          // Mise à jour de l'article existant
+          response = await axios.put(`/articles/${this.article.id}`, {
+            title: this.form.title,
+            content: this.form.content,
+            publish: true
+          })
+          
+          // Redirection après mise à jour
+          window.location.href = '/'
+        } else {
+          // Création d'un nouvel article
+          response = await axios.post('/articles', {
+            title: this.form.title,
+            content: this.form.content
+          })
+          
+          if (response.data.success) {
+            window.location.href = response.data.redirect
+          }
         }
       } catch (error) {
-        if (error.response && error.response.data.errors) {
-          const errors = Object.values(error.response.data.errors).flat()
-          this.error = errors.join(', ')
-        } else if (error.response && error.response.data.message) {
-          this.error = error.response.data.message
+        console.error('Erreur lors de la soumission:', error)
+        
+        // Affichage d'erreur plus détaillé
+        if (error.response) {
+          console.error('Status:', error.response.status)
+          console.error('Data:', error.response.data)
+          alert(`Erreur ${error.response.status}: ${error.response.data.message || 'Une erreur est survenue'}`)
         } else {
-          this.error = 'Une erreur est survenue'
+          alert('Une erreur est survenue lors de la sauvegarde')
         }
       } finally {
-        this.loading = false
+        this.isSubmitting = false
       }
+    },
+    
+    async saveDraft() {
+      // Fonctionnalité de brouillon (optionnelle)
+      console.log('Sauvegarde en brouillon')
     }
   }
 }

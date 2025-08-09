@@ -41,7 +41,7 @@
       </div>
       
       <div class="space-y-2">
-        <label for="role" class="block text-sm font-semibold text-gray-700">Rôle</label>
+        <label for="role" class="block text-sm font-semibold text-gray-700">Rôle (pour la démo)</label>
         <div class="relative">
           <select 
             id="role" 

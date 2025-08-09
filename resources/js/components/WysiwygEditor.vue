@@ -2,34 +2,6 @@
   <div class="wysiwyg-editor">
     <!-- Barre d'outils personnalisée -->
     <div class="toolbar bg-gray-50 border border-gray-300 rounded-t-lg p-2 flex items-center space-x-2">
-      <!-- Boutons de formatage -->
-      <button type="button" class="ql-bold p-2 hover:bg-gray-200 rounded" title="Gras">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M5 3v14h5.5c2.5 0 4.5-2 4.5-4.5 0-1.5-.8-2.8-2-3.5 1.2-.7 2-2 2-3.5C15 3 13 1 10.5 1H5v2zm2 2h3.5c1.4 0 2.5 1.1 2.5 2.5S11.9 10 10.5 10H7V5zm0 7h4c1.7 0 3 1.3 3 3s-1.3 3-3 3H7v-6z"/>
-        </svg>
-      </button>
-      
-      <button type="button" class="ql-italic p-2 hover:bg-gray-200 rounded" title="Italique">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M8 1h8v2h-2.5L9.5 17H12v2H4v-2h2.5L10.5 3H8V1z"/>
-        </svg>
-      </button>
-      
-      <button type="button" class="ql-underline p-2 hover:bg-gray-200 rounded" title="Souligné">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M4 18h12v2H4v-2zM6 2v8c0 2.2 1.8 4 4 4s4-1.8 4-4V2h2v8c0 3.3-2.7 6-6 6s-6-2.7-6-6V2h2z"/>
-        </svg>
-      </button>
-      
-      <button type="button" class="ql-link p-2 hover:bg-gray-200 rounded" title="Lien">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5z"/>
-          <path d="M7.414 15.414a2 2 0 01-2.828-2.828l3-3a2 2 0 012.828 0 1 1 0 001.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5z"/>
-        </svg>
-      </button>
-      
-      <div class="border-l border-gray-300 h-6 mx-2"></div>
-      
       <!-- Menu déroulant pour les variables -->
       <div class="relative" ref="variableDropdown">
         <button 
@@ -148,14 +120,40 @@ export default {
       if (!this.quill) return
       
       try {
-        // Approche alternative : manipulation directe du contenu HTML
         const currentHtml = this.quill.root.innerHTML
         const styledVariable = `<span style="background: #FEF3C7; color: #D97706; font-weight: bold; padding: 2px 4px; border-radius: 3px; margin: 0 2px;">${variable}</span>`
         
-        // Ajouter la variable à la fin du contenu
-        const newHtml = currentHtml + styledVariable
+        let newHtml
         
-        // Mettre à jour le contenu sans passer par les méthodes Quill problématiques
+        // Détecter le dernier élément et insérer la variable dedans
+        if (currentHtml.includes('<h1>')) {
+          // Cas H1 : insérer dans le dernier H1
+          newHtml = currentHtml.replace(/<\/h1>(?!.*<\/h1>)/g, `${styledVariable}</h1>`)
+        } else if (currentHtml.includes('<h2>')) {
+          // Cas H2 : insérer dans le dernier H2
+          newHtml = currentHtml.replace(/<\/h2>(?!.*<\/h2>)/g, `${styledVariable}</h2>`)
+        } else if (currentHtml.includes('<h3>')) {
+          // Cas H3 : insérer dans le dernier H3
+          newHtml = currentHtml.replace(/<\/h3>(?!.*<\/h3>)/g, `${styledVariable}</h3>`)
+        } else if (currentHtml.includes('<strong>') && !currentHtml.endsWith('</p>')) {
+          // Cas texte en gras : insérer dans le dernier strong
+          newHtml = currentHtml.replace(/<\/strong>(?!.*<\/strong>)/g, `${styledVariable}</strong>`)
+        } else if (currentHtml.includes('<em>') && !currentHtml.endsWith('</p>')) {
+          // Cas texte en italique : insérer dans le dernier em
+          newHtml = currentHtml.replace(/<\/em>(?!.*<\/em>)/g, `${styledVariable}</em>`)
+        } else if (currentHtml.includes('<p>')) {
+          // Cas paragraphe normal : insérer dans le dernier paragraphe
+          if (currentHtml.endsWith('<p><br></p>') || currentHtml.endsWith('<p></p>')) {
+            newHtml = currentHtml.replace(/<p><\/p>$|<p><br><\/p>$/, `<p>${styledVariable}</p>`)
+          } else {
+            newHtml = currentHtml.replace(/<\/p>(?!.*<\/p>)/g, `${styledVariable}</p>`)
+          }
+        } else {
+          // Cas par défaut : ajouter dans un nouveau paragraphe
+          newHtml = `${currentHtml}${styledVariable}`
+        }
+        
+        // Mettre à jour le contenu
         this.quill.root.innerHTML = newHtml
         
         // Émettre la mise à jour
@@ -163,6 +161,10 @@ export default {
         
       } catch (error) {
         console.error('Erreur lors de l\'insertion de variable:', error)
+        // Fallback ultra-simple
+        const simpleHtml = this.quill.root.innerHTML + ` <span style="background: #FEF3C7; color: #D97706; font-weight: bold;">${variable}</span>`
+        this.quill.root.innerHTML = simpleHtml
+        this.$emit('update:modelValue', simpleHtml)
       }
       
       this.showVariableMenu = false

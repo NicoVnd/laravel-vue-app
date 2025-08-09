@@ -64,7 +64,7 @@ class ArticleController extends Controller
         return view('articles.edit', compact('article'));
     }
 
-    public function update(Request $request, Article $article): RedirectResponse
+    public function update(Request $request, Article $article): JsonResponse
     {
         $this->authorize('update', $article);
         
@@ -80,8 +80,11 @@ class ArticleController extends Controller
             'published_at' => now()  // Toujours publier
         ]);
 
-        return redirect()->route('articles.index')
-            ->with('success', 'Article modifié avec succès!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Article modifié avec succès!',
+            'redirect' => route('home')
+        ]);
     }
 
     public function destroy(Article $article): JsonResponse

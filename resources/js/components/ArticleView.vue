@@ -87,11 +87,9 @@ export default {
              this.user.id === this.article.user_id
     },
     formattedContent() {
-      // Convertir les retours à la ligne en paragraphes
+      // Retourner directement le contenu HTML sans le modifier
+      // L'éditeur WYSIWYG génère déjà le HTML correct avec les titres
       return this.content
-        .split('\n\n')
-        .map(paragraph => `<p class="mb-4">${paragraph.replace(/\n/g, '<br>')}</p>`)
-        .join('')
     }
   },
   async mounted() {
@@ -134,3 +132,114 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Styles pour les titres générés par Quill */
+.prose h1,
+.prose .ql-header-1 {
+  font-size: 1.875rem !important; /* 30px */
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.2 !important;
+}
+
+.prose h2,
+.prose .ql-header-2 {
+  font-size: 1.5rem !important; /* 24px */
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  line-height: 1.3 !important;
+}
+
+.prose h3,
+.prose .ql-header-3 {
+  font-size: 1.25rem !important; /* 20px */
+  font-weight: 700 !important;
+  color: #374151 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Styles pour les éléments Quill spécifiques */
+.prose p {
+  margin-bottom: 1rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.prose strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin-bottom: 1rem;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  list-style-position: inside;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.25rem;
+}
+
+/* Style pour les variables dynamiques */
+.prose span[style*="background: #FEF3C7"] {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Styles globaux pour tous les éléments dans le contenu */
+.prose * {
+  max-width: 100%;
+}
+
+/* Forcer les styles des titres même avec les classes Quill */
+:deep(.ql-editor h1),
+:deep(.ql-editor h2),
+:deep(.ql-editor h3),
+:deep(h1),
+:deep(h2),
+:deep(h3) {
+  font-weight: 700 !important;
+
+}
+
+:deep(.ql-editor h1),
+:deep(h1) {
+  font-size: 1.875rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+:deep(.ql-editor h2),
+:deep(h2) {
+  font-size: 1.5rem !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+:deep(.ql-editor h3),
+:deep(h3) {
+  font-size: 1.25rem !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+</style>

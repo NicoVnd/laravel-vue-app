@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <!-- En-tête -->
     <div class="text-center">
-      <h1 class="text-4xl font-bold text-[#1E40AF] mb-4">Blog Platform</h1>
+      <h1 class="text-4xl font-bold text-[#1E40AF] mb-4">Blog</h1>
       <p class="text-gray-600 text-lg">Découvrez nos derniers articles</p>
     </div>
 
@@ -122,7 +122,14 @@ export default {
       })
     },
     getExcerpt(content) {
-      const text = content.replace(/<[^>]*>/g, '')
+      // Supprimer les balises HTML
+      let text = content.replace(/<[^>]*>/g, '')
+      
+      // Remplacer les variables par leurs vraies valeurs
+      text = text.replace(/{{nom_utilisateur}}/g, this.user ? this.user.name : 'Visiteur')
+      text = text.replace(/{{date_lecture}}/g, new Date().toLocaleDateString('fr-FR'))
+      
+      // Tronquer le texte si nécessaire
       return text.length > 150 ? text.substring(0, 150) + '...' : text
     },
     canDeleteArticle(article) {

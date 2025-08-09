@@ -5,19 +5,19 @@
         <!-- Logo et navigation à gauche -->
         <div class="flex items-center space-x-8">
           <a href="/" class="flex items-center">
-            <span class="text-2xl font-bold text-[#1E40AF]">BlogPlatform</span>
+            <span class="text-2xl font-bold text-[#1E40AF]">Blog</span>
           </a>
           <!-- Menu navigation - visible uniquement sur desktop -->
           <div class="hidden md:flex items-center space-x-8">
             <a href="/" class="text-gray-600 hover:text-[#D4B896] font-medium transition-colors duration-300">Accueil</a>
-            <a v-if="user && getUserRole() === 'Rédacteur'" href="/create-article" class="text-gray-600 hover:text-[#D4B896] font-medium transition-colors duration-300">Créer un article</a>
+            <a v-if="user && getUserRole() === 'Rédacteur'" href="/articles/create" class="text-gray-600 hover:text-[#D4B896] font-medium transition-colors duration-300">Créer un article</a>
           </div>
         </div>
 
         <!-- Boutons de connexion/déconnexion à droite - visible uniquement sur desktop -->
         <div class="hidden md:flex items-center space-x-4">
           <!-- Si l'utilisateur est connecté -->
-          <div v-if="user" class="relative" @click.away="closeDropdown">
+          <div v-if="user" class="relative">
             <button
               type="button"
               class="inline-flex items-center px-4 py-2 text-[#1E40AF] font-medium rounded-md hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#D4B896] focus:ring-offset-2"
@@ -37,8 +37,7 @@
             <!-- Dropdown Menu -->
             <div
               v-show="isDropdownOpen"
-              class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl focus:outline-none z-50 transition-all duration-200"
-              :class="isDropdownOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'"
+              class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl focus:outline-none z-50 border border-gray-200"
             >
               <div class="py-1">
                 <div class="px-4 py-3 border-b border-gray-100">
@@ -47,27 +46,9 @@
                   <p class="text-xs text-[#D4B896] font-medium mt-1">{{ getUserRole() }}</p>
                 </div>
 
-                <a href="/profile"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
-                  <svg class="w-4 h-4 mr-3 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                  Mon profil
-                </a>
-
-                <a v-if="getUserRole() === 'Rédacteur'" href="/mes-articles"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
-                  <svg class="w-4 h-4 mr-3 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  Mes articles
-                </a>
-
-                <div class="border-t border-gray-100 my-1"></div>
-
                 <button 
                   @click="logout"
-                  class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
                 >
                   <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -109,7 +90,7 @@
                 Accueil
               </span>
             </a>
-            <a v-if="user && getUserRole() === 'Rédacteur'" href="/create-article" class="block text-gray-600 hover:text-[#D4B896] font-medium py-3 px-2 rounded-md hover:bg-blue-50 transition-all">
+            <a v-if="user && getUserRole() === 'Rédacteur'" href="/articles/create" class="block text-gray-600 hover:text-[#D4B896] font-medium py-3 px-2 rounded-md hover:bg-blue-50 transition-all">
               <span class="flex items-center">
                 <svg class="w-5 h-5 mr-2 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -177,9 +158,12 @@ export default {
     await this.checkAuth()
     this.handleScroll()
     window.addEventListener('scroll', this.handleScroll)
+    // Ajouter un écouteur pour fermer le menu déroulant quand on clique ailleurs
+    document.addEventListener('click', this.handleClickOutside)
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll)
+    document.removeEventListener('click', this.handleClickOutside)
   },
   methods: {
     async checkAuth() {
@@ -208,6 +192,12 @@ export default {
     },
     handleScroll() {
       this.isScrolled = window.scrollY > 50
+    },
+    handleClickOutside(event) {
+      // Fermer le dropdown si on clique en dehors
+      if (this.isDropdownOpen && !this.$el.contains(event.target)) {
+        this.isDropdownOpen = false
+      }
     },
     async logout() {
       try {
