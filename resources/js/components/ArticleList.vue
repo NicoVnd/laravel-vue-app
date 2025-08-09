@@ -71,6 +71,53 @@
         </div>
       </article>
     </div>
+    <!-- Pagination -->
+    <div v-if="pagination.last_page > 1" class="flex justify-center items-center space-x-2 mt-8">
+      <!-- Bouton Précédent -->
+      <button @click="previousPage" 
+              :disabled="pagination.current_page === 1"
+              class="px-4 py-2 rounded-lg border transition-colors duration-300"
+              :class="pagination.current_page === 1 
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                : 'bg-white text-[#1E40AF] border-[#1E40AF] hover:bg-[#1E40AF] hover:text-white'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      
+      <!-- Numéros de page -->
+      <template v-for="page in pagination.last_page" :key="page">
+        <button v-if="page === 1 || page === pagination.last_page || Math.abs(page - pagination.current_page) <= 2"
+                @click="goToPage(page)"
+                class="px-4 py-2 rounded-lg border transition-colors duration-300"
+                :class="page === pagination.current_page 
+                  ? 'bg-[#1E40AF] text-white border-[#1E40AF]' 
+                  : 'bg-white text-[#1E40AF] border-[#1E40AF] hover:bg-[#1E40AF] hover:text-white'">
+          {{ page }}
+        </button>
+        <span v-else-if="(page === 2 && pagination.current_page > 4) || (page === pagination.last_page - 1 && pagination.current_page < pagination.last_page - 3)"
+              class="px-2 py-2 text-gray-500">...</span>
+      </template>
+      
+      <!-- Bouton Suivant -->
+      <button @click="nextPage" 
+              :disabled="pagination.current_page === pagination.last_page"
+              class="px-4 py-2 rounded-lg border transition-colors duration-300"
+              :class="pagination.current_page === pagination.last_page 
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                : 'bg-white text-[#1E40AF] border-[#1E40AF] hover:bg-[#1E40AF] hover:text-white'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Informations de pagination -->
+    <div v-if="pagination.last_page > 1" class="text-center mt-4 text-gray-600">
+      Affichage de {{ (pagination.current_page - 1) * pagination.per_page + 1 }} à 
+      {{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }} 
+      sur {{ pagination.total }} articles
+    </div>
   </div>
 </template>
 
@@ -83,7 +130,13 @@ export default {
     return {
       articles: [],
       loading: true,
-      user: null
+      user: null,
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        per_page: 9,
+        total: 0
+      }
     }
   },
   computed: {
@@ -96,10 +149,17 @@ export default {
     await this.checkAuth()
   },
   methods: {
-    async loadArticles() {
+    async loadArticles(page = 1) {
+      this.loading = true
       try {
-        const response = await axios.get('/api/articles')
+        const response = await axios.get(`/api/articles?page=${page}`)
         this.articles = response.data.data
+        this.pagination = {
+          current_page: response.data.current_page,
+          last_page: response.data.last_page,
+          per_page: response.data.per_page,
+          total: response.data.total
+        }
       } catch (error) {
         console.error('Erreur lors du chargement des articles:', error)
       } finally {
@@ -154,6 +214,22 @@ export default {
       } catch (error) {
         console.error('Erreur lors de la suppression:', error)
         alert('Erreur lors de la suppression de l\'article')
+      }
+    },
+    // Méthodes de pagination
+    goToPage(page) {
+      if (page >= 1 && page <= this.pagination.last_page) {
+        this.loadArticles(page)
+      }
+    },
+    previousPage() {
+      if (this.pagination.current_page > 1) {
+        this.goToPage(this.pagination.current_page - 1)
+      }
+    },
+    nextPage() {
+      if (this.pagination.current_page < this.pagination.last_page) {
+        this.goToPage(this.pagination.current_page + 1)
       }
     }
   }
