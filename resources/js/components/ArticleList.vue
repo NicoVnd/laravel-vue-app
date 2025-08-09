@@ -33,8 +33,8 @@
 
     <div v-else class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
       <article v-for="article in articles" :key="article.id" 
-               class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-[#D4B896]">
-        <div class="p-6">
+               class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-[#D4B896] article-card">
+        <div class="p-6 article-content">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] rounded-full flex items-center justify-center text-white font-semibold">
@@ -47,10 +47,10 @@
             </div>
           </div>
           
-          <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{{ article.title }}</h2>
-          <p class="text-gray-600 mb-4 line-clamp-3">{{ getExcerpt(article.content) }}</p>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 article-title">{{ article.title }}</h2>
+          <p class="text-gray-600 mb-4 line-clamp-3 article-excerpt">{{ getExcerpt(article.content) }}</p>
           
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between article-actions">
             <a :href="`/articles/${article.id}`" 
                class="inline-flex items-center text-[#D4B896] hover:text-[#C4A886] font-semibold transition-colors duration-300">
               Lire la suite
@@ -125,7 +125,7 @@ export default {
       // Supprimer les balises HTML
       let text = content.replace(/<[^>]*>/g, '')
       
-      // Remplacer les variables par leurs vraies valeurs
+      // Remplacer les variables par leurs vraies valeurs (pour l'aperçu seulement)
       text = text.replace(/{{nom_utilisateur}}/g, this.user ? this.user.name : 'Visiteur')
       text = text.replace(/{{date_lecture}}/g, new Date().toLocaleDateString('fr-FR'))
       
@@ -161,11 +161,42 @@ export default {
 </script>
 
 <style scoped>
+/* Cartes d'articles avec taille fixe compacte */
+.article-card {
+  height: 290px;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.article-title {
+  height: 2.5rem; /* Hauteur réduite pour le titre */
+  margin-bottom: 0.75rem;
+}
+
+.article-excerpt {
+  height: 4.5rem; /* Hauteur pour exactement 3 lignes */
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.article-actions {
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.25rem; /* Ligne plus compacte */
 }
 
 .line-clamp-3 {
@@ -173,5 +204,6 @@ export default {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.5rem; /* Exactement 3 lignes */
 }
 </style>

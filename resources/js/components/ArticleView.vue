@@ -87,9 +87,30 @@ export default {
              this.user.id === this.article.user_id
     },
     formattedContent() {
-      // Retourner directement le contenu HTML sans le modifier
-      // L'éditeur WYSIWYG génère déjà le HTML correct avec les titres
-      return this.content
+      let content = this.content
+      
+      // Remplacer les variables en préservant les styles HTML
+      if (this.user) {
+        // Remplacer {{nom_utilisateur}} en gardant les styles
+        content = content.replace(
+          /{{nom_utilisateur}}/g, 
+          `<span style="color: #2563eb; font-weight: 600;">${this.user.name}</span>`
+        )
+      } else {
+        content = content.replace(
+          /{{nom_utilisateur}}/g, 
+          `<span style="color: #2563eb; font-weight: 600;">Visiteur</span>`
+        )
+      }
+      
+      // Remplacer {{date_lecture}} en gardant les styles
+      const currentDate = new Date().toLocaleDateString('fr-FR')
+      content = content.replace(
+        /{{date_lecture}}/g, 
+        `<span style="color: #2563eb; font-weight: 600;">${currentDate}</span>`
+      )
+      
+      return content
     }
   },
   async mounted() {
@@ -195,15 +216,6 @@ export default {
 
 .prose li {
   margin-bottom: 0.25rem;
-}
-
-/* Style pour les variables dynamiques */
-.prose span[style*="background: #FEF3C7"] {
-  background-color: #dbeafe !important;
-  color: #1e40af !important;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 500;
 }
 
 /* Styles globaux pour tous les éléments dans le contenu */

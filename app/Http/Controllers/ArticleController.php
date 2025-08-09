@@ -23,10 +23,9 @@ class ArticleController extends Controller
 
     public function show(Article $article): View
     {
-        // Injecter les variables dynamiques
-        $content = $this->injectVariables($article->content);
-        
-        return view('articles.show', compact('article', 'content'));
+        // Passer le contenu brut sans traitement des variables
+        // Le frontend (ArticleView.vue) se chargera du remplacement avec les styles
+        return view('articles.show', compact('article'), ['content' => $article->content]);
     }
 
     public function create(): View
