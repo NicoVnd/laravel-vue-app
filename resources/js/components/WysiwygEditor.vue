@@ -67,7 +67,8 @@ export default {
       showVariableMenu: false,
       // Ajouter les variables pour éviter les erreurs Vue
       nom_utilisateur: '{{nom_utilisateur}}',
-      date_lecture: '{{date_lecture}}'
+      date_lecture: '{{date_lecture}}',
+      savedCursorPosition: null, // Ajouter cette ligne
     }
   },
   mounted() {
@@ -116,55 +117,33 @@ export default {
       }
     },
     
+    showVariables() {
+      this.showVariableMenu = !this.showVariableMenu
+    },
+    
     insertVariable(variable) {
       if (!this.quill) return
       
       try {
-        const currentHtml = this.quill.root.innerHTML
-        const styledVariable = `<span style="background: #FEF3C7; color: #D97706; font-weight: bold; padding: 2px 4px; border-radius: 3px; margin: 0 2px;">${variable}</span>`
+        // Utiliser directement le fallback HTML qui fonctionne
+        const currentHtml = this.quill.root.innerHTML || '<p><br></p>'
+        const styledVariable = `<span style="color: #2563eb; font-weight: bold; margin: 0 2px;">${variable}</span>`
         
         let newHtml
-        
-        // Détecter le dernier élément et insérer la variable dedans
-        if (currentHtml.includes('<h1>')) {
-          // Cas H1 : insérer dans le dernier H1
-          newHtml = currentHtml.replace(/<\/h1>(?!.*<\/h1>)/g, `${styledVariable}</h1>`)
-        } else if (currentHtml.includes('<h2>')) {
-          // Cas H2 : insérer dans le dernier H2
-          newHtml = currentHtml.replace(/<\/h2>(?!.*<\/h2>)/g, `${styledVariable}</h2>`)
-        } else if (currentHtml.includes('<h3>')) {
-          // Cas H3 : insérer dans le dernier H3
-          newHtml = currentHtml.replace(/<\/h3>(?!.*<\/h3>)/g, `${styledVariable}</h3>`)
-        } else if (currentHtml.includes('<strong>') && !currentHtml.endsWith('</p>')) {
-          // Cas texte en gras : insérer dans le dernier strong
-          newHtml = currentHtml.replace(/<\/strong>(?!.*<\/strong>)/g, `${styledVariable}</strong>`)
-        } else if (currentHtml.includes('<em>') && !currentHtml.endsWith('</p>')) {
-          // Cas texte en italique : insérer dans le dernier em
-          newHtml = currentHtml.replace(/<\/em>(?!.*<\/em>)/g, `${styledVariable}</em>`)
-        } else if (currentHtml.includes('<p>')) {
-          // Cas paragraphe normal : insérer dans le dernier paragraphe
-          if (currentHtml.endsWith('<p><br></p>') || currentHtml.endsWith('<p></p>')) {
-            newHtml = currentHtml.replace(/<p><\/p>$|<p><br><\/p>$/, `<p>${styledVariable}</p>`)
-          } else {
-            newHtml = currentHtml.replace(/<\/p>(?!.*<\/p>)/g, `${styledVariable}</p>`)
-          }
+        if (currentHtml === '<p><br></p>' || currentHtml.trim() === '') {
+          newHtml = `<p>${styledVariable}<br></p>`
         } else {
-          // Cas par défaut : ajouter dans un nouveau paragraphe
-          newHtml = `${currentHtml}${styledVariable}`
+          // Insérer avant la dernière balise fermante
+          newHtml = currentHtml.replace(/<\/([^>]+)>\s*$/, ` ${styledVariable}</$1>`)
         }
         
-        // Mettre à jour le contenu
         this.quill.root.innerHTML = newHtml
-        
-        // Émettre la mise à jour
         this.$emit('update:modelValue', newHtml)
         
+        console.log('Variable insérée:', variable)
+        
       } catch (error) {
-        console.error('Erreur lors de l\'insertion de variable:', error)
-        // Fallback ultra-simple
-        const simpleHtml = this.quill.root.innerHTML + ` <span style="background: #FEF3C7; color: #D97706; font-weight: bold;">${variable}</span>`
-        this.quill.root.innerHTML = simpleHtml
-        this.$emit('update:modelValue', simpleHtml)
+        console.error('Erreur insertion:', error)
       }
       
       this.showVariableMenu = false
