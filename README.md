@@ -97,6 +97,8 @@ php artisan serve
 npm run dev
 ```
 
+---
+
 ### 🛠 Technologies utilisées
 
 - **Backend** : Laravel (PHP)
