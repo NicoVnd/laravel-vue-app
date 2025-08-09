@@ -182,8 +182,14 @@ export default {
       })
     },
     getExcerpt(content) {
-      // Supprimer les balises HTML
-      let text = content.replace(/<[^>]*>/g, '')
+      // Ajouter des espaces après les balises de titre et de paragraphe avant de les supprimer
+      let text = content
+        .replace(/<\/h[1-6]>/g, ' ') // Ajouter un espace après les balises de fermeture de titre
+        .replace(/<\/p>/g, ' ')     // Ajouter un espace après les balises de fermeture de paragraphe
+        .replace(/<br\s*\/?>/g, ' ') // Remplacer les <br> par des espaces
+        .replace(/<[^>]*>/g, '')     // Supprimer toutes les autres balises HTML
+        .replace(/\s+/g, ' ')        // Remplacer les espaces multiples par un seul espace
+        .trim()                      // Supprimer les espaces en début et fin
       
       // Remplacer les variables par leurs vraies valeurs (pour l'aperçu seulement)
       text = text.replace(/{{nom_utilisateur}}/g, this.user ? this.user.name : 'Visiteur')
