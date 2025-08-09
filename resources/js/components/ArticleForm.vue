@@ -43,13 +43,6 @@
         </a>
         
         <div class="flex space-x-4">
-          <button
-            type="button"
-            @click="saveDraft"
-            class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-          >
-            Sauvegarder en brouillon
-          </button>
           
           <button
             type="submit"
@@ -142,10 +135,6 @@ export default {
       }
     },
     
-    async saveDraft() {
-      // Fonctionnalité de brouillon (optionnelle)
-      console.log('Sauvegarde en brouillon')
-    }
   }
 }
 </script>

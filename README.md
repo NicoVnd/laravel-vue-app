@@ -1,61 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📰 Plateforme de Rédaction d’Articles
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Une application Laravel + Vue.js permettant la création, la modification et la lecture d’articles de blog avec **insertion de variables dynamiques** (personnalisation du contenu pour chaque utilisateur).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🔹 Éditeur WYSIWYG
+- Mise en forme : **gras**, *italique*, _souligné_
+- Insertion de liens
+- Menu pour insérer des **variables dynamiques** :
+  - `{{nom_utilisateur}}` → remplacé par le nom du lecteur
+  - `{{date_lecture}}` → remplacé par la date du jour
+- Les variables sont affichées dans une couleur distincte pour les reconnaître facilement.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🔹 Gestion des articles
+- **Page d’accueil** : liste des articles (design libre)
+- **Page de lecture** : contenu affiché avec les variables remplacées
+- **Page de création/modification** : éditeur WYSIWYG pour rédiger les articles
 
-## Learning Laravel
+### 🔹 Personnalisation du contenu
+Lorsqu’un utilisateur lit un article :
+- `{{nom_utilisateur}}` → remplacé par son prénom/nom
+- `{{date_lecture}}` → remplacé par la date du jour
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 👥 Comptes de démonstration
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### ✏️ Rédacteurs (création & modification d’articles)
+| Nom       | Email                       | Mot de passe   |
+|-----------|-----------------------------|----------------|
+| Nicolas   | nicolas@redacteur.xyz       | password123    |
+| William   | william@redacteur.xyz       | password123    |
+| Benjamin  | benjamin@redacteur.xyz      | password123    |
+| Patrick   | patrick@redacteur.xyz       | password123    |
 
-## Laravel Sponsors
+### 👤 Utilisateurs classiques (lecture uniquement)
+| Nom            | Email                  | Mot de passe   |
+|----------------|------------------------|----------------|
+| Marie Dupont   | marie@user.xyz         | password123    |
+| Jean Martin    | jean@user.xyz          | password123    |
+| Sophie Bernard | sophie@user.xyz        | password123    |
+| Lucas Moreau   | lucas@user.xyz         | password123    |
+| Emma Leroy     | emma@user.xyz          | password123    |
+| Thomas Petit   | thomas@user.xyz        | password123    |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 📦 Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 1️⃣ Cloner le projet
+```bash
+git clone https://github.com/NicoVnd/laravel-vue-app
+cd laravel-vue-app
+```
 
-## Contributing
+### 2️⃣ Installer les dépendances
+```bash
+composer install
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3️⃣ Configurer les variables d'environnement
+```bash
+cp .env.example .env
+```
+Puis configurer :
+La connexion à la base de données (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
 
-## Code of Conduct
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nom_de_la_base
+DB_USERNAME=utilisateur
+DB_PASSWORD=mot_de_passe
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4️⃣ Générer la clé de l'application
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 5️⃣ Lancer les migrations et insérer les comptes de test
+```bash
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 6️⃣ Lancer le serveur de développement backend
+```bash
+php artisan serve
+```
+### 7️⃣ Lancer le serveur de développement frontend
+```bash
+npm run dev
+```
 
-## License
+### 🛠 Technologies utilisées
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Backend** : Laravel (PHP)
+- **Frontend** : Vue.js (JavaScript)
+- **CSS** : TailwindCSS
+- **Base de données** : MySQL
+- **Éditeur** : Quill.js (WYSIWYG)
+
+### 🖼 Aperçu des pages
+
+**Accueil** → Liste des articles
+
+**Lecture** → Contenu avec variables remplacées
+
+**Création** → Éditeur WYSIWYG avec insertion de variables
+
+**⚠️ Avertissement**
+Ce projet a été développé dans le cadre d'un test technique. Il n'est pas destiné à être utilisé en production.
+
+
+
+
+
+
+
+
