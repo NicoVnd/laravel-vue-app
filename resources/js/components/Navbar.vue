@@ -5,7 +5,8 @@
         <!-- Logo et navigation à gauche -->
         <div class="flex items-center space-x-8">
           <a href="/" class="flex items-center">
-            <span class="text-2xl font-bold text-[#1E40AF]">Blog</span>
+            <span class="text-2xl font-bold text-[#1E40AF]">Blog Sport</span>
+
           </a>
           <!-- Menu navigation - visible uniquement sur desktop -->
           <div class="hidden md:flex items-center space-x-8">

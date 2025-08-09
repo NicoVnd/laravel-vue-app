@@ -2,7 +2,8 @@
   <div class="space-y-8">
     <!-- En-tête -->
     <div class="text-center">
-      <h1 class="text-4xl font-bold text-[#1E40AF] mb-4">Blog</h1>
+      <h1 class="text-4xl font-bold text-[#1E40AF] mb-4">Blog Sport</h1>
+
       <p class="text-gray-600 text-lg">Découvrez nos derniers articles</p>
     </div>
 
